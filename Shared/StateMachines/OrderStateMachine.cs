@@ -35,7 +35,6 @@ namespace Shared.StateMachines
                 When(OrderCreated)
                 .Then(context =>
                 {
-                    context.Instance.OrderId = context.Data.OrderId;
                     Console.WriteLine($"[Saga] Sipariş alındı: {context.Data.OrderId}");
                 })
                 .TransitionTo(WaitingForStockControl)

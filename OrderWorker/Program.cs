@@ -1,4 +1,6 @@
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using OrderWorker.Context;
 using Shared.StateMachines;
 
 namespace OrderWorker
@@ -9,10 +11,22 @@ namespace OrderWorker
         {
             var builder = Host.CreateApplicationBuilder(args);
 
+            builder.Services.AddDbContext<OrderDbContext>(opt =>
+            {
+                opt.UseSqlServer(builder.Configuration.GetConnectionString("OrderDb"));
+            });
+
             builder.Services.AddMassTransit(x =>
             {
                 x.AddSagaStateMachine<OrderStateMachine, OrderState>()
-                .InMemoryRepository();
+                .EntityFrameworkRepository(r =>
+                {
+                    r.ConcurrencyMode = ConcurrencyMode.Optimistic;
+                    r.AddDbContext<DbContext, OrderDbContext>((provider, optionsBuilder) =>
+                    {
+                        optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("OrderDb"));
+                    });
+                });
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

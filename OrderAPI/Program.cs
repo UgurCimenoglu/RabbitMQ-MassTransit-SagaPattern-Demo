@@ -1,5 +1,6 @@
 
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Shared.Events;
 namespace OrderAPI
 {
@@ -31,6 +32,7 @@ namespace OrderAPI
             app.MapPost("/api/orders", async (IPublishEndpoint publishEndpoint) =>
             {
                 var orderId = Guid.NewGuid();
+                orderId = Guid.Parse("145AB339-E107-4ECA-BC80-D70620F898C6");
                 var amount = new Random().Next(100, 1000);
 
                 var createdOrder = new OrderCreated
